@@ -56,8 +56,8 @@ if len(arr) != n:
 else:
     print("\nOriginal Array:", arr)
 
-    result1 = deterministicQuickSort(arr.copy())
+    result1 = deterministicQuickSort(arr)
     print("Deterministic Quick Sort:", result1)
 
-    result2 = randomizedQuickSort(arr.copy())
+    result2 = randomizedQuickSort(arr)
     print("Randomized Quick Sort:", result2)

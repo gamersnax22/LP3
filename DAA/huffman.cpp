@@ -1,87 +1,84 @@
 #include <iostream>
-#include <vector>
-#include <map>
-#include <algorithm>
+#include <queue>
 using namespace std;
-class Node {
+
+class Node
+{
 public:
-    char value;
-    int frequency;
+    char ch;
+    int freq;
     Node *left, *right;
-    Node(char v = '\0', int f = 0) {
-        value = v;
-        frequency = f;
-        left = right = NULL;
+
+    Node(char c, int f)
+    {
+        ch = c;
+        freq = f;
+        left = NULL;
+        right = NULL;
     }
 };
-class HuffmanEncoding {
-private:
-    vector<Node*> q;
-    map<char, string> encoding;
-    string str;
+
+class Compare
+{
 public:
-    HuffmanEncoding(string s) {
-        str = s;
-    }
-    void charFrequency() {
-        map<char, int> count;
-        for (char ch : str)
-            count[ch]++;
-        for (auto x : count) {
-            q.push_back(new Node(x.first, x.second));
-        }
-        sort(q.begin(), q.end(),
-             [](Node* a, Node* b) {
-                 return a->frequency < b->frequency;
-             });
-    }
-    void buildTree() {
-        while (q.size() > 1) {
-            Node* n1 = q[0];
-            Node* n2 = q[1];
-            q.erase(q.begin());
-            q.erase(q.begin());
-            Node* node = new Node('#', n1->frequency + n2->frequency);
-            node->left = n1;
-            node->right = n2;
-            q.push_back(node);
-            sort(q.begin(), q.end(),
-                 [](Node* a, Node* b) {
-                     return a->frequency < b->frequency;
-                 });
-        }
-    }
-    void helper(Node* node, string code = "") {
-        if (!node)
-            return;
-        if (node->value != '#') {
-            encoding[node->value] = code;
-            return;
-        }
-        helper(node->left, code + "0");
-        helper(node->right, code + "1");
-    }
-    void huffmanEncoding() {
-        helper(q[0], "");
-    }
-    void printEncoding() {
-        cout << "\nChar | Huffman Code\n";
-        for (auto x : encoding) {
-            cout << "  " << x.first << "   |   " << x.second << endl;
-        }
-    }
-    void encode() {
-        charFrequency();
-        buildTree();
-        huffmanEncoding();
-        printEncoding();
+    bool operator()(Node *a, Node *b)
+    {
+        return a->freq > b->freq;
     }
 };
-int main() {
-    string str;
-    cout << "Enter string to be encoded: ";
-    cin >> str;
-    HuffmanEncoding h(str);
-    h.encode();
+
+void printCode(Node *root, string code)
+{
+    if (root == NULL)
+        return;
+
+    if (root->left == NULL && root->right == NULL)
+    {
+        cout << root->ch << " : " << code << endl;
+        return;
+    }
+
+    printCode(root->left, code + "0");
+    printCode(root->right, code + "1");
+}
+
+int main()
+{
+    priority_queue<Node*, vector<Node*>, Compare> pq;
+    int n;
+    char ch;
+    int freq;
+
+    cout << "Enter number of characters: ";
+    cin >> n;
+    for (int i = 0; i < n; i++)
+    {
+        cout << "Enter character and frequency: ";
+        cin >> ch >> freq;
+
+        pq.push(new Node(ch, freq));
+    }
+
+    while (pq.size() > 1)
+    {
+        Node *left = pq.top();
+        pq.pop();
+
+        Node *right = pq.top();
+        pq.pop();
+
+        Node *parent = new Node('-', left->freq + right->freq);
+
+        parent->left = left;
+        parent->right = right;
+
+        pq.push(parent);
+    }
+
+    Node *root = pq.top();
+
+    cout << "Huffman:" << endl;
+    printCode(root, "");
+
     return 0;
 }

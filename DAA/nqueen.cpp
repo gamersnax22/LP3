@@ -1,107 +1,70 @@
-#include <iostream>
-#include <vector>
+#include <bits/stdc++.h>
 using namespace std;
-class NQueens {
-private:
-    int size;
-    vector<vector<bool>> board;
-    int count;
-public:
-    NQueens() {
-        cout << "Enter size of chessboard: ";
-        cin >> size;
-        board.resize(size, vector<bool>(size, false));
-        count = 0;
+
+bool isSafe(int **arr,int x,int y,int n){
+    for(int row = 0;row<x;row++){
+        if(arr[row][y]==1){
+            return false;
+        }
     }
-    void printBoard() {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (board[i][j])
-                    cout << "Q ";
-                else
-                    cout << "X ";
+    int row = x;
+    int col = y;
+    while(row >= 0 && col >=0){
+        if(arr[row][col]==1){
+            return false;
+        }
+        row--;
+        col--;
+    }
+    row = x;
+    col = y;
+    while(row >= 0 && col < n){
+        if(arr[row][col]==1){
+            return false;
+        }
+        row--;
+        col++;
+    }
+    return true;
+}
+
+bool nQueen(int** arr,int x,int n){
+    if(x>=n){
+        return true;
+    }
+    
+    for(int col = 0;col<n;col++){
+        if(isSafe(arr,x,col,n)){
+            arr[x][col] = 1;
+            if(nQueen(arr,x+1,n)){
+            return true;
+            }
+            arr[x][col] = 0;
+        }
+    }
+    return false;
+}
+
+int main() {
+	int n;
+    cout << "Enter size of chessboard: ";
+	cin >>n;
+	int **arr = new int*[n];
+	for(int i=0;i<n;i++){
+        arr[i] = new int[n];
+        for(int j=0;j<n;j++){
+            arr[i][j]=0;
+        }
+    }
+    if(nQueen(arr,0,n)){
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                cout << arr[i][j] << " ";
             }
             cout << endl;
         }
-        cout << endl;
+    }else{
+        cout<<"not possible";
     }
-    bool isSafe(int row, int col) {
-        // Check column
-        for (int i = 0; i < size; i++) {
-            if (board[i][col])
-                return false;
-        }
-        // Upper-left diagonal
-        for (int i = row, j = col; i >= 0 && j >= 0; i--, j--) {
-            if (board[i][j])
-                return false;
-        }
-        // Lower-right diagonal
-        for (int i = row, j = col; i < size && j < size; i++, j++) {
-            if (board[i][j])
-                return false;
-        }
-
-        // Upper-right diagonal
-        for (int i = row, j = col; i >= 0 && j < size; i--, j++) {
-            if (board[i][j])
-                return false;
-        }
-        // Lower-left diagonal
-        for (int i = row, j = col; i < size && j >= 0; i++, j--) {
-            if (board[i][j])
-                return false;
-        }
-        return true;
-    }
-    void setPositionFirstQueen() {
-        int row, col;
-        cout << "Enter coordinates of first queen:\n";
-        cout << "Enter row (1-" << size << "): ";
-        cin >> row;
-        cout << "Enter column (1-" << size << "): ";
-        cin >> col;
-        board[row - 1][col - 1] = true;
-        printBoard();
-    }
-    void solve(int row) {
-        if (row == size) {
-            count++;
-            cout << "Solution " << count << ":\n";
-            printBoard();
-            return;
-        }
-        bool queenAlreadyPlaced = false;
-        for (int j = 0; j < size; j++) {
-            if (board[row][j]) {
-                queenAlreadyPlaced = true;
-                break;
-            }
-        }
-        if (queenAlreadyPlaced) {
-            solve(row + 1);
-            return;
-        }
-        for (int col = 0; col < size; col++) {
-            if (isSafe(row, col)) {
-                board[row][col] = true;
-                solve(row + 1);
-                board[row][col] = false; // Backtrack
-            }
-        }
-    }
-    void displayMessage() {
-        if (count > 0)
-            cout << "Solution exists for the given position of the queen." << endl;
-        else
-            cout << "Solution doesn't exist for the given position of the queen." << endl;
-    }
-};
-
-int main() {
-    NQueens solver;
-    solver.setPositionFirstQueen();
-    solver.solve(0);
-    solver.displayMessage();
     return 0;
 }
