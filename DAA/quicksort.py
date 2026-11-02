@@ -4,46 +4,56 @@ import random
 # Deterministic Quick Sort
 def deterministicQuickSort(arr):
 
-    if len(arr) <= 1:
-        return arr
+    stack = [(0, len(arr) - 1)]
 
-    pivot = arr[-1]
+    while stack:
+        low, high = stack.pop()
 
-    left = []
-    right = []
+        if low < high:
+            pivot = arr[high]
+            i = low - 1
 
-    for i in arr[:-1]:
-        if i <= pivot:
-            left.append(i)
-        else:
-            right.append(i)
+            for j in range(low, high):
+                if arr[j] <= pivot:
+                    i += 1
+                    arr[i], arr[j] = arr[j], arr[i]
 
-    return deterministicQuickSort(left) + [pivot] + deterministicQuickSort(right)
+            arr[i + 1], arr[high] = arr[high], arr[i + 1]
+            p = i + 1
+
+            stack.append((low, p - 1))
+            stack.append((p + 1, high))
+
+    return arr
 
 
 # Randomized Quick Sort
 def randomizedQuickSort(arr):
 
-    if len(arr) <= 1:
-        return arr
+    stack = [(0, len(arr) - 1)]
 
-    # Select random pivot
-    pivotIndex = random.randint(0, len(arr) - 1)
-    pivot = arr[pivotIndex]
+    while stack:
+        low, high = stack.pop()
 
-    left = []
-    right = []
+        if low < high:
+            r = random.randint(low, high)
+            arr[r], arr[high] = arr[high], arr[r]
 
-    for i in range(len(arr)):
-        if i == pivotIndex:
-            continue
+            pivot = arr[high]
+            i = low - 1
 
-        if arr[i] <= pivot:
-            left.append(arr[i])
-        else:
-            right.append(arr[i])
+            for j in range(low, high):
+                if arr[j] <= pivot:
+                    i += 1
+                    arr[i], arr[j] = arr[j], arr[i]
 
-    return randomizedQuickSort(left) + [pivot] + randomizedQuickSort(right)
+            arr[i + 1], arr[high] = arr[high], arr[i + 1]
+            p = i + 1
+
+            stack.append((low, p - 1))
+            stack.append((p + 1, high))
+
+    return arr
 
 
 # Main program
@@ -54,10 +64,8 @@ arr = list(map(int, input("Enter elements: ").split()))
 if len(arr) != n:
     print("Please enter exactly", n, "elements.")
 else:
-    print("\nOriginal Array:", arr)
-
-    result1 = deterministicQuickSort(arr)
+    result1 = deterministicQuickSort(arr.copy())
     print("Deterministic Quick Sort:", result1)
 
-    result2 = randomizedQuickSort(arr)
+    result2 = randomizedQuickSort(arr.copy())
     print("Randomized Quick Sort:", result2)
